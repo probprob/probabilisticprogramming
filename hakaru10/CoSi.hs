@@ -1,21 +1,14 @@
 {-# Language ExistentialQuantification, NoMonomorphismRestriction, GADTs, StandaloneDeriving, FlexibleInstances #-}
 
 
-module ShDs where
+module CoSi where
 
 import Control.Applicative
 import qualified Data.Map as M
 import System.Random
 
-xor :: Bool -> Bool -> Bool
-xor x y = not (x == y)
-
 
 type Prob = Double
-
--- What a happy coincidence! Haskell has the right good notation. We only
--- need to rename our conditional and dirac into somewhat historical names
--- (>>=) and return.
 
 class Monad d => Dist d where
   bern :: Prob -> d Bool
@@ -23,15 +16,15 @@ class Monad d => Dist d where
                          -- conditioning
 
 
---Beispiel aus Wiki
-coin = do
-  x <- bern 0.5
-  return x
-
---{csr
+--Beispiel aus Wiki, True entspricht Kopf
+coin = bern 0.5
 
 --mehrfacher Münzwurf
+toss :: Dist m => Int -> m [Bool]
 toss n = sequence $ replicate n coin
+
+--runSample 2 $ toss 3
+--[[False,True,False],[False,True,False]]
 
 -- runExact $ toss 2
 --[([False,False],0.25),([False,True],0.25),([True,False],0.25),([True,True],0.25)]
@@ -41,68 +34,37 @@ toss n = sequence $ replicate n coin
 headcount :: Dist f => Int -> f Int
 headcount n = fmap (length . filter (\x -> x)) $ toss n
 
+
 composeCoinHeadCount = do
   x <- coin
   if x then headcount 2 else headcount 1
 
 
---runExact composeCoinHeadCount 
---[(0,0.375),(1,0.5),(2,0.125)]
-
---Wahrscheinlichkeiten aus Wiki
---P(0)=0.5*0.5 + 0.5*0.25  = 3/8
---P(1)=0.5*0.5 + 0.5*0.5   = 4/8
---P(2)=0.5*0.25            = 1/8
-
---Sampling liefert plausible Werte
-countCompose samplesize n =  length $ filter (\x -> x == n) $ runSample samplesize composeCoinHeadCount
---ShDs> map (countCompose 100000)  [0,1,2]
--- [37450,50052,12498]
+--wenn die Anzahl Köpfe bekannt ist -> nicht passende Samples werden verworfen
+condCoinHeadCount observedCount = do
+  x <- coin
+  hc <- if x then headcount 2 else headcount 1  
+  if hc /= observedCount then failure
+    else return x
 
 
 
---csr}
+--zaehlt trues, gesamtanzahl, anteil_trues
+true_all_prop :: (Foldable t1, Fractional t) => t1 Bool -> (t, t, t)
 
-twocoins = do
-  x <- bern 0.5
-  y <- bern 0.5
-  return $ xor x y
-
-twocoins1 = do
-  x <- bern 0.5
-  y <- bern 0.5
-  return $ (x,(y,xor x y))
-
-mytwocoins1 = do
-  x <- bern 0.5
-  y <- bern 0.5
-  return $ (((xor x y), (x,y)))
-
--- This is just the syntactic sugar. GHC re-writes it into the form
--- twocoins' that we saw before.
-
--- Again, what is the type of twocoins?
-
--- Let us implement another model, as an exercise:
--- die roll; throw n dice
--- Draw the model
-
-class Dist d => Die d where
-  die :: d Int   -- in Agda, Finite 6. But we do Int for now
-
---instance Die unten:  die = Single $ [ (x,1/6) | x <- [1..6] ]
-
-dieroll n = fmap sum $ sequence $ replicate n die
+true_all_prop bools = foldr upd (0,0,0) bools
+  where upd b (t,a,p) = (nt, a+1, nt / (a+1))
+          where nt = if b then t+1 else t
 
 
+--map (true_all_prop  . runSample 1000 . condCoinHeadCount ) [0..3]
+--[(142.0,384.0,0.3697916666666667),
+-- (235.0,509.0,0.46168958742632615),
+-- (107.0,107.0,1.0),
+-- (0.0,0.0,0.0)]
 
-_ = runExact (dieroll 3)
-
--- What are those functions, fmap and sequence?
---The sequence function takes a list of monadic computations, executes each one in turn and returns a list of the results. If any of the computations fail, then the whole function fails:
---sequence :: Monad m => [m a] -> m [a] 
---sequence = foldr mcons (return [])
---             where mcons p q = p >>= \x -> q >>= \y -> return (x:y)
+--Anzahl 3 gibt's nicht, Bei Anzahl 2 ist Anteil Kopf 100 Prozent
+--Wahrscheinlichkeit Kopf ist bei Anzahl 0 am geringsten
 
 -- Implementing grass model
 
@@ -123,6 +85,7 @@ nnot p True  = p
 nnot p False = 1
 
 _ = runExact grass_fwd
+--[(False,0.3942),(True,0.6058)]
 
 -- Implement uniformly given bern
 -- Demonstrate that the implementation is correct
@@ -141,38 +104,6 @@ _ = runExact $ uniformly [1]
 _ = runExact $ uniformly [1,2]
 _ = runExact $ uniformly [1..10]
 
-
-{- Monty Hall Problem
-https://en.wikipedia.org/wiki/Monty_Hall_problem
-
-    Suppose you're on a game show, and you're given the choice of three doors:
-    Behind one door is a car; behind the others, goats. You pick a door, say
-    No. 1, and the host, who knows what's behind the doors, opens another door,
-    say No. 3, which has a goat. He then says to you, "Do you want to pick door
-    No. 2?" Is it to your advantage to switch your choice?
--}
-
-monty_hall :: Bool -> Dst Bool
-monty_hall should_switch = do
-  car_door    <- uniformly doors
-  my_choice   <- uniformly doors
-  opened_door <- uniformly (del car_door . del my_choice $ doors)
-  if should_switch then
-    let [remaining_door] = del opened_door . del my_choice $ doors in
-    return $ remaining_door == car_door
-  else
-    return $ my_choice == car_door
- where
-   doors = [1,2,3]
-   -- Delete an element from a list of was present
-   del :: Eq a => a -> [a] -> [a]
-   del x [] = []
-   del x (h:t)
-     | x == h     = t
-     | otherwise  = h : del x t
-
-_ = runExact $ monty_hall False
-_ = runExact $ monty_hall True
 
 -- ------------------------------------------------------------------------
 -- Conditioning
@@ -257,21 +188,6 @@ normalize :: PT a -> PT a
 normalize pt = map (map_snd (/nf)) pt
  where nf = sum $ map snd pt
 
--- Eldest daughter puzzle
--- A family has exactly two kids, one of them is a girl.
--- What is the chance the older is a girl?
-
-girl :: Dst Bool
-girl = do
-  g1 <- bern 0.5
-  g2 <- bern 0.5
-  if g1 || g2 then return g1 else failure
-
-
-_ = runExact girl
-_ = normalize $ runExact girl
-
--- Grass model
 
 grass_wet = do
   rain         <- bern 0.3
@@ -302,57 +218,6 @@ alarm = do
   if (j && not m) then return b else failure
 
 _ = normalize $ runExact alarm
-
--- Fair coin tosses given arbitrarily biased coin (von Neumann trick)
--- Show/Prove the correctness
--- (recursion, rejection)
-
-fair_coin :: Dst Bool -> Dst Bool
-fair_coin c = undefined
-
-_ = runExact $ fair_coin (bern 0.2)
-
--- Drunken coin example:
--- very large depth and very low probability of acceptance
-
--- Drunken coin example: coin flipping by a drunk.
--- Because the person flipping the coin is drunk, most of the time
--- the result of flipping is a lost/dropped coin
-
-drunk_coin :: Dst Bool
-drunk_coin = do
-  c <- bern 0.5
-  lost <- bern 0.9
-  if lost then failure else return c
-
--- Compute AND of n tosses of the drunk coin
-dcoin_and n = fmap (foldr1 (&&)) . sequence $ replicate n drunk_coin
-
-dcoin_and1 1 = drunk_coin
-dcoin_and1 n = do
-  -- t <-  dcoin_and1 (n-1)
-  t <- categorical . runExact $ dcoin_and1 (n-1)
-  h <- drunk_coin
-  return $ h && t
-
-_ = runExact $ dcoin_and 10
--- [(False,9.990234374999978e-11),(True,9.765624999999978e-14)]
-
--- Can we implement more efficiently?
--- (shorthand and) Why the False probability changes?
-
--- Alarm puzzle
--- http://aima.eecs.berkeley.edu/slides-pdf/chapter14a.pdf
--- p5 and 6
--- See examples on pp19 and 20
--- ------------------------------------------------------------------------
--- Implementation
--- It is quite tricky; and those who want to know the tricky bit,
--- can ask later...
-
--- I show the implementation that you haven't seen: it is fully
--- above the board and faithfully implements specification.
-
 -- Probability Table
 type PT a = [(a,Prob)]  -- Ord a
 
@@ -417,10 +282,6 @@ instance Dist Dst where
   bern p  = Single [(True, p), (False,1-p)]
   failure = Single []
 
-instance Die Dst where
-  die = Single $ [ (x,1/6) | x <- [1..6] ]
-
-_ = runExact twocoins
 
 -- A different handler: sampling
 
@@ -442,7 +303,6 @@ runSample n m = go (mkStdGen 17) n m
               scanl1 (\ (_,p1) (x,p2) -> (x,p1+p2)) pt
       in (x,g1)
 
-_ = runSample 10 twocoins
 
 _ = let n = 10000 in (/ fromIntegral n) . fromIntegral . length . filter id $ runSample n grass_fwd
 

@@ -1,4 +1,4 @@
-{-# Language NoMonomorphismRestriction, GADTs #-}
+{-# Language ExistentialQuantification, NoMonomorphismRestriction, GADTs, StandaloneDeriving, FlexibleInstances #-}
 
 -- Graphical models and the inference on them
 -- Discrete case
@@ -107,6 +107,7 @@ twocoins1'' =
   chain'' (bern'' 0.5) $ \y ->
   dirac'' (x,(y,(xor x y)))
 
+
 -- The notation is a bit ungainly though...
 
 -- What a happy coincidence! Haskell has the right good notation. We only
@@ -127,6 +128,11 @@ twocoins1 = do
   x <- bern 0.5
   y <- bern 0.5
   return $ (x,(y,xor x y))
+
+mytwocoins1 = do
+  x <- bern 0.5
+  y <- bern 0.5
+  return $ (((xor x y), (x,y)))
 
 -- This is just the syntactic sugar. GHC re-writes it into the form
 -- twocoins' that we saw before.
@@ -502,9 +508,12 @@ data Dst a where
   Single :: PT a -> Dst a
   Chain  :: PT b -> (b -> Dst a) -> Dst a
 
+
 instance Functor Dst where
    fmap f (Single pt) = Single (map (map_fst f) pt)
    fmap f (Chain d k) = Chain d (fmap f . k)
+
+
 
 instance Applicative Dst where
   pure    = return
