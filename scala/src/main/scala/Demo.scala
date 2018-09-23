@@ -19,4 +19,8 @@ object Demo {
     def demo2: Dist[Int] =  startCoinDist >>= { b => if (b) twoCoinDist else  twoCoinDist  } ;
     def demo3: Dist[Int] =  startCoinDist >>= { b => if (b) threeCoinDist else  threeCoinDist  } ;
 
+
+	def main(args: Array[String]) {
+        println(demo)
+    }
 }
