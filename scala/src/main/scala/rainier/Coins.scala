@@ -24,7 +24,7 @@ object Coins {
       val samplesTwo = RandomVariable(twoCoins.generator).sample(n)
       histogram(samplesTwo, "samplesTwo")
 
-      val samplesThree = RandomVariable(twoCoins.generator).sample(n)
+      val samplesThree = RandomVariable(threeCoins.generator).sample(n)
       histogram(samplesThree, "samplesThree")
 
       //https://github.com/stripe/rainier/blob/develop/docs/impl.md
@@ -61,6 +61,7 @@ object Coins {
           println( k + ": " + v)
         }
     }
+}
 
 /*
 [info] Running rainier.Coins 
@@ -75,23 +76,20 @@ samplesTwo
 0: 2530
 ------------------
 samplesThree
-2: 2476
-1: 4951
-0: 2570
+2: 3648
+1: 3792
+3: 1269
+0: 1287
 ------------------
 composeGenerator
-2: 3170
-1: 4382
-3: 601
-0: 1843
+2: 3134
+1: 4467
+3: 577
+0: 1818
 ------------------
 composeRandomVariable is nonsense
-2: 3677
-1: 3807
-3: 1274
-0: 1238
-
+2: 3672
+1: 3759
+3: 1309
+0: 1256
 */
-
-}
-
