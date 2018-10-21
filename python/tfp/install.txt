@@ -1,0 +1,12 @@
+Downloads/Miniconda3-latest-Linux-x86_64.sh 
+conda create -n tensorflow_env tensorflow
+pip install tensorflow-probability
+
+-----
+tail -3 ~/.bashrc 
+
+# User specific aliases and functions
+. /home/christoph/miniconda3/etc/profile.d/conda.sh
+-----
+
+conda activate tensorflow_env
