@@ -1,0 +1,64 @@
+?distributions
+?rnorm
+# Funktionen als Random Variables
+rnorm(1)
+rnorm(1)
+# 10 normaltverteilte Zufallswerte
+rnorm(10)
+# Definition einer RV
+r <- rnorm
+plot(r, -4, 4)
+# plot_rv_r.png
+rplusr <- function(n) r(n) + r(n)
+plot(rplusr)
+curve(r, add=TRUE, col="red")
+#rplusr_und_r.png
+#Vergleich der Wahrscheinlichkeitsdichten
+dens <- function(rv) density(rv(1000))
+plot(dens(r))
+points(dens(rplusr), col="red")
+# rplusr liefert öfter Werte mit grösserem Betrag
+# dichte_r_und_rplusr
+# Berechnete RVs
+mkrv <- function(c, n) c * r(n)
+rmal2_1000 <- mkrv(2,1000)
+points(density(rmal2_1000), col="blue", type="l")
+#nicht_distributiv.png
+# rmal2 hat breitere Verteilung als rplusr
+#mkrv liefert keine Funktion (RV) sonder nur Samples
+#es geht besser
+library(functional)
+?Curry
+mkrvc <- function(c) Curry(mkrv, c)
+mkrvc(2)
+plot(dens(mkrvc(2))
+)
+points(density(rmal2_1000), col="blue", type="l")
+# sieht gut aus rmal2_1000 verteilt wie mkrvc(2)(1000)
+points(dens(mkrvc(3)), col="red", type="l")
+# mal3 ist wie erwartet breiter verteilt
+#mixture
+?rnorm
+rm2 <- Curry(rnorm, mean=2)
+plot(dens(rm2))
+points(r, col="red", type="l")
+points(dens(r), col="red", type="l")
+rbernfair <- function(n) rbinom(n, 1, 0.5)
+?rbinom
+plot(rbernfair)
+mix <- function(n) if(rbernfair(1)) { r} else {rm2}
+plot(mix)
+mix <- function(n) if(rbernfair(1)) { r(n) } else { rm2(n) }
+plot(mix)
+plot(r, col="red")
+plot(mix)
+curve(r, col="red", add=TRUE)
+# schwarz_ist_kein_mix, wo ist der Bug?
+mix <- function(n) ifelse (rbernfair(n), r(n), rm2(n))
+plot(mix)
+curve(r, col="red", add=TRUE)
+curve(rm2, col="blue", add=TRUE)
+# bunter_mix.png
+plot(dens(mix))
+# mix_density.png
+savehistory("~/probabilisticprogramming/R/randomfunctions/funktionen_als_zufallsvariablen.history")
