@@ -18,4 +18,22 @@ dat <- data.frame(xx = c(rcountsucc(n,2),rcountsucc(n,3),rmix(n)),yy = rep(c("Su
 ggplot(dat, aes(x=xx, fill=yy)) +
 geom_histogram(binwidth=.5, colour="black", position="dodge") +
 scale_fill_manual(values=c("green", "blue","yellow"))
+rbern <- function(n) rbinom(n, 1, prob=0.5)
+rcountsucc <- function(n, nr) rbinom(n, nr, prob=0.5)
+bern <- function() rbinom(1, 1, prob=0.5)
+mix <- function(b) if(b) rcountsucc(1,2) else rcountsucc(1, 3)
+machine <- function() {b <- bern();c(b, mix(b))}
+machine()
+dfmachine <- data.frame(t(replicate(n, machine())))
+colnames(dfmachine) <- c("hidden", "count")
+str(dfmachine)
+machinetable <- table(dfmachine)
+machinetable
+library(vcd)
+mosaic(machinetable, shade = T)
+assoc(machinetable, shade = T)
+#
+# mix liefert ein Sample der Joint Distribution
+# table berechnet die contingency table
+# vcd: "Visualizing Categorical Data"
 savehistory("~/probabilisticprogramming/R/machine/history.R")
