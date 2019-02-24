@@ -1,0 +1,53 @@
+#Fedora 29
+#zuerst openblas-dev (Dependency für LA Pakete fehlt)
+dnf install openblas-dev
+
+#das ist Jula 1.0
+dnf install julia
+julia> using Turing, MCMCChain, Distributions, StatsPlots
+
+
+#alternativ oder zusätzlich:
+#julia binary darf nicht wegbenannt werden, siehe ln -s unten
+
+Download:
+julia-1.1.0-linux-x86_64.tar.gz
+
+cd ~
+mkdir jl
+cd jl
+tar xvf ../Downloads/julia-1.1.0-linux-x86_64.tar.gz 
+chmod u+x julia-1.1.0/bin/julia
+mv julia-1.1.0/bin/julia julia-1.1.0/bin/julia11
+#kann beim Bauen, Kompilieren von Paketen notwendig sein:
+ln -s ~/jl/julia-1.1.0/bin/julia11  ~/jl/julia-1.1.0/bin/julia
+
+cd ~
+vi .bash_profile
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:$HOME/jl/julia-1.1.0/bin
+. .bash_profile
+
+#diverse Julia Pakete installieren und vorkompilieren
+
+julia11
+# naechste Eingabe wechselt in die Paket Management Repl
+julia> ]
+(v1.1) pkg> add Turing
+(v1.1) pkg> add StatsPlots
+(v1.1) pkg> add Plots
+(v1.1) pkg> add Distributions
+(v1.1) pkg> add MCMCChain
+
+#https://github.com/TuringLang/Libtask.jl/issues/18
+
+(v1.1) pkg> build
+#zurück in die Julia Repl
+(v1.1) pkg> ^C
+julia> using Turing, MCMCChain, Distributions, StatsPlots
+
+#http://turing.ml/tutorials/0-introduction/
+
+
+
+
+
