@@ -1,3 +1,10 @@
+
+#Demo Freie Monade in FrMo.hs
+
+cabal run
+
+
+
 # Hakaru-FLOLAC16
 
 * [埋込み確率プログラミング言語とその漸進評価](http://okmij.org/ftp/kakuritu/Hakaru10/PPL.pdf)
