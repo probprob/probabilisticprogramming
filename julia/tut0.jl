@@ -9,7 +9,7 @@ using Random, Distributions
 using StatsPlots
 
 # Set the true probability of heads in a coin.
-p_true = 0.9
+p_true = 0.5
 
 # Iterate from having seen 0 observations to 100 observations.
 Ns = 0:100;
@@ -37,4 +37,5 @@ chain = sample(coinflip(data), HMC(1000, 0.05, 10));
 describe(chain)
 p_summary = Chains(chain[:p])
 plot(p_summary, seriestype = :histogram)
+
 
