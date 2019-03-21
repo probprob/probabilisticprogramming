@@ -17,4 +17,4 @@ describe(chn)
 
 # Plot and save results
 p = plot(chn)
-savefig("gdemo.png")
+

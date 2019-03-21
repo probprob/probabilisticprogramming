@@ -4,7 +4,7 @@
 Bei Moggi geht es um semantische Analyse.  
 
 * Partielle Berechnung 
-* Nicht Determinismus
+* Nichtdeterminismus
   
   
 Haskell implementiert die Monaden:  
@@ -43,9 +43,12 @@ functions, and potentials."
 
 
 # Semantik für Probabilistische Programme
-* https://arxiv.org/abs/1701.02547  
+
+* 2017:  https://arxiv.org/abs/1701.02547  
 
 * A Convenient Category for Higher-Order Probability Theory  
 
 * "Thus quasi-Borel spaces form semantics for a  probabilistic  programming  language  in  the  monadic style"
 
+* Lawvere Theorien : "The Lawvere theory for probabilistic nondeterminism is that freely generated ..." 
+* (Hyland, Power "Discrete Lawvere theories and computational effects")

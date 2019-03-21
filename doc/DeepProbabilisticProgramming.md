@@ -12,7 +12,7 @@
 * Prototypisches Deep Generative Model (2013)
 * Encoder Network und Decoder Network
 * bzw.: Inference Network und Generative Network 
-* Probabilistiche Neuronale Netze
+* Probabilistische Neuronale Netze
 * Und trotzdem differenzierbar (sog. Reparametrisierungstrick)
 * Stochastic Gradient Descent Training 
 * liefert Posterior

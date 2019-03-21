@@ -1,0 +1,54 @@
+Bobkonf 2019 Probabilistic Programming
+
+10 Minuten
+
+Einleitung: 
+-interessantes Thema mit Potential
+-Überblick (Stichpunkt: Universelle PPL)
+
+Praxis:
+- Screenshot Fahrzeugkonfigurator: Konfigurationslogik (Stichpunkt Probabilistische Logik))
+- Kreditrating: Scorecard und Simulationsverfahren
+* Texas Hold'em Bot
+- Finanzindustrie (Quantopian: PyMC3, Stripe: Rainier)
+- Forecasting (Facebook Prophet: Stan)
+* ...
+
+----
+10 Minuten
+
+Wahrscheinlichkeitsverteilungen, Simulationen in R Studio  
+-Zufallsvariablen als Zufallsfunktionen in R (Stichpunkt: funktionale Techniken wie Closures oder Currying anwendbar)
+-Verkettung von Zufallsexperimenten (Laufendes Beispiel "Teilchenzerfall") 
+*Zufallsprozess Random Walk (Markov, Martingal und Monade)
+*Gauß Prozess 
+
+----
+20 Minuten
+
+Wahrscheinlichkeitsmonade
+-Notion of Computation (Vergleich mit Maybe Monade)
+-Demo Eigenbau Scala: "Teilchenzerfall"
+*Eigenbau in Scala: Implementierung 
+*Scala Rainier Wahrscheinlichkeitsmonade
+*Olegs Haskellimplementierung (Freie Monade), Haskell Monad Goodies für umsonst
+*Alternative Algebraic Effects: Idris (ermöglicht Zufallsfunktionen/Variablen)
+
+----
+30 Minuten
+
+Probabibilistische Modelle und Inferenz in Turing/Julia
+-Interaktiv, Aufgaben: 
+-Schritt für Schritt Münzwurf Modell
+-Anpassungen Prior -> Änderung Posteriori (Bayes)
+*Implementierung von "Teilchenzerfall"   
+
+----
+15 Minuten
+
+Deep Probabilistic Programming
+-Deep Generative Networks treffen Probabilistic Programming
+*Gaussian Process Layer in Tensorflow Probability
+*Neural Processes
+
+
