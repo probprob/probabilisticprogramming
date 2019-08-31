@@ -1,0 +1,18 @@
+library(rstanarm)
+n = 100
+x <- 1:n
+y <-  12 + 4*x + rnorm(n, sd=13)
+plot(y)
+lm(y~x)
+fit <- stan_lm( y ~ x, prior = R2(location = 0.5, what="mean"))
+summary(fit)
+plot(fit)
+plot(y)
+y <-  12 + 4*x + rnorm(n, sd=23)
+plot(y)
+y <-  12 + 4*x + rnorm(n, sd=43)
+plot(y)
+fit <- stan_lm( y ~ x, prior = R2(location = 0.5, what="mean"))
+plot(fit)
+summary(fit)
+savehistory("~/probabilisticprogramming/stan/lm/lm.history")
