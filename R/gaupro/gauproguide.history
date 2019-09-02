@@ -1,0 +1,28 @@
+library(GauPro)
+x <- seq(0,1,l=10)
+y <- abs(sin(2*pi*x))^.8
+plot(x, y)
+gp <- GauPro(x, y)
+curve(gp$predict(x), col=2)
+x <- seq(0,1,l=10)
+y <- abs(sin(2*pi*x))^.8
+plot(x, y)
+curve(gp$predict(x), col=2, add=T)
+curve(gp$predict(x)+2*gp$predict(x, se=T)$se, add=T, col=4)
+#2 Standardabweichungen = ca. 95%
+curve(gp$predict(x)-2*gp$predict(x, se=T)$se, add=T, col=4)
+plot(gp)
+kern <- Matern52$new(0)
+gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kern, parallel=FALSE)
+plot(gpk)
+kern.exp <- Exponential$new(0)
+gpk.exp <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kern.exp, parallel=FALSE)
+plot(gpk)
+savehistory("~/probabilisticprogramming/R/gaupro/gauproguide.history")
+n <- 12
+x <- matrix(seq(0,1,length.out = n), ncol=1)
+y <- sin(2*pi*x) + rnorm(n,0,1e-1)
+gp <- GauPro::GauPro(X=x, Z=y)
+curve(gp$pred(x));points(x,y)
+curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T);curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
+savehistory("~/probabilisticprogramming/R/gaupro/gauproguide.history")
