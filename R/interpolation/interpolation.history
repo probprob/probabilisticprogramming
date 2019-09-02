@@ -13,4 +13,4 @@ library(splines)
 ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="lm", formula = "y ~ splines::bs(x,3)")
 ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="lm", formula = "y ~ splines::bs(x,7)")
 echo "https://stackoverflow.com/questions/2977999/r-ggplot-how-to-use-a-custom-smoother-gaussian-process"
-savehistory("~/probabilisticprogramming/R/interpolation/interpolation.history")
+ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="lm", formula = "y ~  x + I(x^2) + I(x^3)")
