@@ -1,0 +1,19 @@
+#https://quant.stackexchange.com/questions/1260/r-code-for-ornstein-uhlenbeck-process
+ornstein_uhlenbeck <- function(T,n,nu,lambda,sigma,x0){
+dw  <- rnorm(n, 0, sqrt(T/n))
+dt  <- T/n
+x <- c(x0)
+for (i in 2:(n+1)) {
+x[i]  <-  x[i-1] + lambda*(nu-x[i-1])*dt + sigma*dw[i-1]
+}
+return(x);
+}
+plot(ornstein_uhlenbeck(T=1,n=1000,nu=0,lambda=0,sigma=0.1,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=1000,nu=0,lambda=0,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=1000,nu=0,lambda=1,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=100,nu=0,lambda=1,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=100,nu=0,lambda=0,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=100,nu=0,lambda=1,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=100,nu=0,lambda=3,sigma=0.5,x0=5))
+plot(ornstein_uhlenbeck(T=1,n=100,nu=0,lambda=10,sigma=0.5,x0=5))
+savehistory("~/probabilisticprogramming/R/ornstein-uhlenbeck/ornstein-uhlenbeck.history")
