@@ -1,0 +1,6 @@
+library(fields)
+data( COmonthlyMet)
+quilt.plot(CO.loc, CO.elev)
+obj<- spatialProcess( CO.loc, CO.elev)
+surface(obj)
+savehistory("~/probabilisticprogramming/R/randomfield/randomfield.history")
