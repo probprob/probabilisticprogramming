@@ -1,0 +1,28 @@
+library(functional)
+linarr <- function(n,a,b) a + b * seq(0, 1, length.out = n)
+# linarr: n Werte einer Gerade a + b*x
+plot(linarr(10, runif(1), runif(1, min=0.8, max=1.2)))
+#Werte von 5 Zufallsgeraden
+five_lin <- replicate(5, mklin(10, runif(1), runif(1, min=0.8, max=1.2)))
+str(five_lin)
+matplot(five_lin, type="l")
+#das funktioniert wegen Non Standard Evaluation (runif wird nicht einmal sondern für jede Zeile neu evaluiert)
+#Funktion wird durch n Funktionswerte ersetzt
+#man kann auch mit Funktionen arbeiten und sich nicht auf ein n committen
+#
+mk_lin_ab <- function(a,b) Curry(linarr, a=a, b=b)
+str(mk_lin_ab(10))
+str(mk_lin_ab(1,2)(10))
+plot(mk_lin_ab(1,2)(10))
+# mk_lin_ab erzeugt Closure (a und b gefangen, n bleibt frei)
+#
+fs = replicate(5,mk_lin_ab(runif(1), runif(1, min=0.8, max=1.2)))
+str(fs)
+#Liste von 5 zufälligen linearen Funktionen
+#
+# Wrapper für dynamischen Funktionsaufruf mit einen Parameter
+call_with_n <- function(n) Curry(do.call, args=list(n))
+twenty_values_each <- sapply(fs, call_with_n(20))
+str(twenty_values_each)
+matplot(twenty_values_each, type="l")
+savehistory("~/probabilisticprogramming/R/functional/functional.history")
