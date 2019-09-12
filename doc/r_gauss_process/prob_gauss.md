@@ -8,9 +8,7 @@ Gaußprozesse sind überall
 ========================================================
 
 
-```{r gpytorch, echo=FALSE, fig.cap=""}
-knitr::include_graphics("gpytorch.png")
-```
+![](gpytorch.png)
 
 Wahrscheinlichkeitsverteilung von Funktionen
 
@@ -25,23 +23,23 @@ Anwendungsbeispiele
 - Nachrichtentechnik
 - Geostatistik
 
-```{r surface, echo=FALSE, fig.cap="NCAR fields package"}
-knitr::include_graphics("surface_spatialProcess_elevation.png")
-```
+![NCAR fields package](surface_spatialProcess_elevation.png)
 
 (NCAR fields package)
 
 Interpolation
 ========================================================
 - Bayes Posterior versus Konfidenzintervall
-```{r}
+
+```r
 library(ggplot2)
 n=10
 x<-1:n
 y<-x + rnorm(n)
 ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="loess", level=0.99, span=0.6)
-
 ```
+
+![plot of chunk unnamed-chunk-1](prob_gauss-figure/unnamed-chunk-1-1.png)
 
 Einfache Gaußprozesse
 ========================================================
@@ -54,33 +52,46 @@ Einfache Gaußprozesse
 
 Weißes gaußsches Rauschen
 ========================================================
-```{r}
+
+```r
 plot(rnorm(100))
 ```
+
+![plot of chunk unnamed-chunk-2](prob_gauss-figure/unnamed-chunk-2-1.png)
 
 Lineares Modell
 ========================================================
 
-```{r}
+
+```r
 plot(1:100 + rnorm(100, sd=5))
 ```
 
+![plot of chunk unnamed-chunk-3](prob_gauss-figure/unnamed-chunk-3-1.png)
+
 Random Walk I
 ========================================================
-```{r}
+
+```r
 plot(cumsum(rnorm(100)))
 ```
+
+![plot of chunk unnamed-chunk-4](prob_gauss-figure/unnamed-chunk-4-1.png)
 
 Random Walk II
 ========================================================
 
-```{r, out.width = '70%'}
+
+```r
 matplot(replicate(5, cumsum(rnorm(100))), type="l")
 ```
 
+<img src="prob_gauss-figure/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" width="70%" />
+
 Ornstein-Uhlenbeck
 =====================================================
-```{r}
+
+```r
 #https://quant.stackexchange.com/questions/1260/r-code-for-ornstein-uhlenbeck-process
 ornstein_uhlenbeck <- function(T,n, x0,nu,lambda,sigma){
 dw  <- rnorm(n, 0, sqrt(T/n))
@@ -108,9 +119,12 @@ sigma: Varianz
 Ornstein-Uhlenbeck (Plot)
 ========================================================
 
-```{r}
+
+```r
 plot(ornstein_uhlenbeck(T=2,n=1000,x0=5,nu=0,lambda=2,sigma=0.5))
 ```
+
+![plot of chunk unnamed-chunk-7](prob_gauss-figure/unnamed-chunk-7-1.png)
 
 
 Zufallsvariablen -> zufällige Funktion
@@ -128,7 +142,8 @@ Zufallsvariablen -> zufällige Funktion
 
 Zufällige Funktionen in R 
 ================================================
-```{r}
+
+```r
 library(functional)
 # linarr: n Werte einer Gerade a + b*x (im Intervall [0,1])
 linarr <- function(n,a,b) a + b * seq(0, 1, length.out = n)
@@ -143,17 +158,18 @@ random_lins = replicate(5,mk_lin_ab(runif(1), runif(1, min=0.8, max=1.2)))
 call_with_n <- function(n) Curry(do.call, args=list(n))
 
 twenty_values_each <- sapply(random_lins, call_with_n(20))
-
 ```
 
 (Vergleich: stan_lm)
 
 Zufällige Funktionen in R (Plot)
 ================================================
-```{r}
-matplot(twenty_values_each, type="l")
 
+```r
+matplot(twenty_values_each, type="l")
 ```
+
+![plot of chunk unnamed-chunk-9](prob_gauss-figure/unnamed-chunk-9-1.png)
 
 
 Multivariate Normalverteilung I
@@ -163,11 +179,14 @@ Multivariate Normalverteilung I
 
 -der zweite Schritt ist mit dem ersten schwach korreliert
 
-```{r, out.width = '70%'}
+
+```r
 library(ggplot2)
 steps <- data.frame(t(replicate(1000, cumsum(rnorm(100)))))
 ggplot(data=steps, aes(x=X1, y=X2)) + geom_density_2d() + coord_fixed()
 ```
+
+<img src="prob_gauss-figure/unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="70%" />
 
 (Simulation 1000 Random Walks)
 
@@ -179,11 +198,13 @@ Multivariate Normalverteilung II
 
 -Schritt 99 ist stark mit Schritt 98 korelliert
 
-```{r}
+
+```r
 library(ggplot2)
 ggplot(data=steps, aes(x=X98, y=X99)) + geom_point() + coord_fixed()
-
 ```
+
+![plot of chunk unnamed-chunk-11](prob_gauss-figure/unnamed-chunk-11-1.png)
 
 Multivariate Normalverteilung III
 ========================================================
@@ -196,14 +217,18 @@ Multivariate Normalverteilung III
 
 - Summen bzw. Linearkombinationen bleiben normalverteilt
 
-```{r}
+
+```r
 plot(density(rnorm(1000, mean=1) + 2*rnorm(1000, mean=2)))
 ```
+
+![plot of chunk unnamed-chunk-12](prob_gauss-figure/unnamed-chunk-12-1.png)
 
 Multivariate Normalverteilung Persp I
 ========================================================
 
-```{r}
+
+```r
 # plotly interaktiv -> Projekt gaussian
 m = diag(2)
 # vektorisiert, nicht normiert
@@ -211,21 +236,24 @@ e2 <- function(x,y) exp(-rowSums((cbind(x,y) %*% solve(m) * cbind(x,y))))
 #
 x <- y<- seq(-4,4, length.out=100)
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
-
 ```
+
+![plot of chunk unnamed-chunk-13](prob_gauss-figure/unnamed-chunk-13-1.png)
 
 
 Multivariate Normalverteilung Persp II
 ========================================================
 
-```{r}
+
+```r
 # plotly interaktiv -> Projekt gaussian
 
 m=rbind(c(1.1,0.5), c(0.5,3.1))
 
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
-
 ```
+
+![plot of chunk unnamed-chunk-14](prob_gauss-figure/unnamed-chunk-14-1.png)
 
 Referenzen Gaußprozesse I
 ========================================================
