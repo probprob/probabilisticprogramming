@@ -34,7 +34,7 @@ knitr::include_graphics("surface_spatialProcess_elevation.png")
 Interpolation
 ========================================================
 - Bayes Posterior versus Konfidenzintervall
-```{r}
+```{r interpolation}
 library(ggplot2)
 n=10
 x<-1:n
@@ -43,6 +43,10 @@ ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="
 
 ```
 
+- Splines 
+
+  https://stats.stackexchange.com/questions/144634/splines-vs-gaussian-process-regression
+  
 Einfache Gaußprozesse
 ========================================================
 
@@ -54,35 +58,35 @@ Einfache Gaußprozesse
 
 Weißes gaußsches Rauschen
 ========================================================
-```{r}
+```{r rauschen}
 plot(rnorm(100))
 ```
 
 Lineares Modell
 ========================================================
 
-```{r}
+```{r linear}
 plot(1:100 + rnorm(100, sd=5))
 ```
 
 Random Walk I
 ========================================================
-```{r}
+```{r randomwalk}
 plot(cumsum(rnorm(100)))
 ```
 
 Random Walk II
 ========================================================
 
-```{r, out.width = '70%'}
+```{r randomwalk2}
 matplot(replicate(5, cumsum(rnorm(100))), type="l")
 ```
 
 Ornstein-Uhlenbeck
 =====================================================
-```{r}
+```{r ornstein}
 #https://quant.stackexchange.com/questions/1260/r-code-for-ornstein-uhlenbeck-process
-ornstein_uhlenbeck <- function(T,n, x0,nu,lambda,sigma){
+ornstein_uhlenbeck <- function(T, n, x0, nu, lambda, sigma){
 dw  <- rnorm(n, 0, sqrt(T/n))
 dt  <- T/n
 x <- c(x0)
@@ -93,23 +97,169 @@ return(x);
 }
 ```
 
-T: Dauer
-
-n:Anzahl Werte
-
 x0: Startwert
 
-nu: Attraktor
+nu: Attraktor 
 
 lambda: Attraktionskraft
-
-sigma: Varianz
 
 Ornstein-Uhlenbeck (Plot)
 ========================================================
 
-```{r}
+```{r plot_ornstein}
 plot(ornstein_uhlenbeck(T=2,n=1000,x0=5,nu=0,lambda=2,sigma=0.5))
+```
+
+- https://math.stackexchange.com/questions/2292050/how-is-the-ornstein-uhlenbeck-process-stationary-if-the-mean-and-variance-are-ti
+
+Gaußprozess Definition
+========================================================
+
+- f ~ GP( mu(x), k(x1, x2) )
+- jede Teilmenge ist multivariat normal verteilt
+- Erwartungswert: mu(x) 
+- Kovarianz: k(x1, x2)
+
+- Kovarianz schränkt Art der Funktionen ein 
+
+
+Multivariate Normalverteilung 
+========================================================
+
+-korrellierte Normalverteilungen
+
+-der zweite Schritt ist mit dem ersten schwach korreliert
+
+```{r multivariat}
+steps <- data.frame(t(replicate(1000, cumsum(rnorm(100)))))
+ggplot(data=steps, aes(x=X1, y=X2)) + geom_density_2d() + coord_fixed()
+```
+
+(Simulation 1000 Random Walks)
+
+
+Multivariate Normalverteilung 99 Schritte
+========================================================
+
+-korrellierte Normalverteilungen
+
+-Schritt 99 ist stark mit Schritt 98 korelliert
+
+```{r multivariat_99}
+ggplot(data=steps, aes(x=X98, y=X99)) + geom_point() + coord_fixed()
+
+```
+
+Multivariate Normalverteilung Eigenschaften
+========================================================
+
+- Die marginalen Verteilungen sind immer normal
+
+- Konditionierung einer Dimension -> restliche Dimensionen bleiben normalverteilt 
+
+  A-posteriori bleibt also Gaußprozess
+
+- Summen bzw. Linearkombinationen bleiben normalverteilt
+
+```{r gauss_linearkombination}
+plot(density(rnorm(1000, mean=1) + 2*rnorm(1000, mean=2)))
+```
+
+Multivariate Normalverteilung Persp unkorreliert
+========================================================
+
+```{r persp1}
+m = diag(2)
+# vektorisiert, nicht normiert
+e2 <- function(x,y) exp(-rowSums((cbind(x,y) %*% solve(m) * cbind(x,y))))
+#
+x <- y<- seq(-4,4, length.out=100)
+persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
+
+```
+
+- plotly interaktiv -> Projekt gaussian
+
+
+Multivariate Normalverteilung Persp korreliert
+========================================================
+
+```{r persp2}
+# plotly interaktiv -> Projekt gaussian
+
+m=rbind(c(1.1,0.5), c(0.5,3.1))
+
+persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
+
+```
+
+
+Kovarianzfunktionen der Beispiele
+========================================================
+- weißes Rauschen
+
+  k(x_i, x_j) = kronecker(i, j)
+
+- Random Walk
+
+  k(x1, x2) = min(x1, x2 ) (Einstein 1905)
+
+- Ornstein-Uhlenbeck
+
+  k(x1, x2) = .....
+
+
+Kovarianzfunktionen
+========================================================
+
+- squared exponential, gaussian, rbf
+
+  k(x1,x2) = sigma^2 * exp(-(x1-x2)^2 / 2*length^2 )
+  
+  homogen, isotrop, sehr glatt, length bestimmt Reichweite
+  
+- periodisch
+
+- linear
+
+- Duvenaud: Kernel Cookbook
+
+  Murphy: Kapitel 14
+
+- Raum für Kreativität
+
+Gaußprozess Inferenz
+========================================================
+
+- multivariate Gaußverteilung sind sehr gutartig
+
+-  Formeln für Posterior mu und Kovarianz (keine wilden Integrale)
+  
+- Kovarianz Formel mit Matrix Inverse -> kubische Komplexität
+
+- Murphy: Kapitel 4
+
+Inferenz mit GauPro 
+========================================================
+
+
+```{r gaupro}
+library(GauPro)
+n <- 12
+x <- matrix(seq(0,1,length.out = n), ncol=1)
+y <- sin(2*pi*x) + rnorm(n,0,1e-1)
+gp <- GauPro::GauPro(X=x, Z=y)
+curve(gp$pred(x));points(x,y)
+```
+
+
+GauPro Matern Kernel
+========================================================
+
+```{r matern}
+kern <- Matern52$new(0)
+gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kern, parallel=FALSE)
+plot(gpk)
 ```
 
 
@@ -128,7 +278,7 @@ Zufallsvariablen -> zufällige Funktion
 
 Zufällige Funktionen in R 
 ================================================
-```{r}
+```{r functional}
 library(functional)
 # linarr: n Werte einer Gerade a + b*x (im Intervall [0,1])
 linarr <- function(n,a,b) a + b * seq(0, 1, length.out = n)
@@ -146,97 +296,115 @@ twenty_values_each <- sapply(random_lins, call_with_n(20))
 
 ```
 
-(Vergleich: stan_lm)
 
 Zufällige Funktionen in R (Plot)
 ================================================
-```{r}
+```{r plot_randomfunctions}
 matplot(twenty_values_each, type="l")
 
 ```
 
 
-Multivariate Normalverteilung I
+Stan Linear Model
 ========================================================
 
--korrellierte Normalverteilungen
-
--der zweite Schritt ist mit dem ersten schwach korreliert
-
-```{r, out.width = '70%'}
-library(ggplot2)
-steps <- data.frame(t(replicate(1000, cumsum(rnorm(100)))))
-ggplot(data=steps, aes(x=X1, y=X2)) + geom_density_2d() + coord_fixed()
-```
-
-(Simulation 1000 Random Walks)
+```{r stan_lm}
 
 
-Multivariate Normalverteilung II
-========================================================
+library(rstan)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
 
--korrellierte Normalverteilungen
-
--Schritt 99 ist stark mit Schritt 98 korelliert
-
-```{r}
-library(ggplot2)
-ggplot(data=steps, aes(x=X98, y=X99)) + geom_point() + coord_fixed()
+library(rstanarm)
+n = 100
+x <- 1:n
+y <-  12 + 4*x + rnorm(n, sd=13)
+plot(y)
 
 ```
 
-Multivariate Normalverteilung III
+Stan Linear Model Fit 
 ========================================================
-
-- Die marginalen Verteilungen sind immer normal
-
-- Konditionierung einer Dimension -> restliche Dimensionen bleiben normalverteilt 
-
-  A-posteriori bleibt also Gaußprozess
-
-- Summen bzw. Linearkombinationen bleiben normalverteilt
-
-```{r}
-plot(density(rnorm(1000, mean=1) + 2*rnorm(1000, mean=2)))
+```{r stan_lm_fit}
+fit <- stan_lm( y ~ x, prior = R2(location = 0.5, what="mean"), chains=1)
 ```
 
-Multivariate Normalverteilung Persp I
+Stan Linear Model Summary 
 ========================================================
 
-```{r}
-# plotly interaktiv -> Projekt gaussian
-m = diag(2)
-# vektorisiert, nicht normiert
-e2 <- function(x,y) exp(-rowSums((cbind(x,y) %*% solve(m) * cbind(x,y))))
-#
-x <- y<- seq(-4,4, length.out=100)
-persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
+```{r summary_stan_lm}
+summary(fit)
+```
+
+Stan Linear Model Plot
+========================================================
+
+```{r plot_stan_lm}
+plot(fit)
 
 ```
 
-
-Multivariate Normalverteilung Persp II
+Stan Gaußprozess Modell (Stan Examples Project)
 ========================================================
 
-```{r}
-# plotly interaktiv -> Projekt gaussian
+```{r show_gp-fit, echo=F}
+writeLines(readLines("gp-fit.stan"))
+```
 
-m=rbind(c(1.1,0.5), c(0.5,3.1))
 
-persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
+Stan Gaußprozess Fit 
+========================================================
+
+```{r fit_gp, warning=FALSE}
+
+stan_dat <- read_rdump('gp-fit.data.R')
+
+fit_gp <- stan(file="gp-fit.stan", data=stan_dat,
+               iter=200, chains=1)
+
 
 ```
 
-Referenzen Gaußprozesse I
+Stan Gaußprozess Print
 ========================================================
 
+```{r print_gp}
+
+print(fit_gp, pars = c('rho','alpha','sigma'))
+
+```
+
+Stan Gaußprozess Plot
+========================================================
+
+```{r plot_gp}
+
+plot(fit_gp)
+
+```
+
+Referenzen 
+========================================================
+
+
+- David MacKay: Introduction to Gaussian Processes
+
+  https://www.ics.uci.edu/~welling/teaching/KernelsICS273B/gpB.pdf
+  
 - Görtler, Jochen and Kehlbeck, Rebecca and Deussen, Oliver
 
   https://distill.pub/2019/visual-exploration-gaussian-processes/
 
   sehr coole interaktive Einführung
   
-  weiterführende Literaturhinweise (z.B. Deep Kernel Learning)
+
+- Functional Neural Process
+
+  https://arxiv.org/abs/1906.08324
+
+Referenzen Gaußprozesse I
+========================================================
+
   
 - Andreas Damianou: Gaussian process lecture 
 
@@ -264,13 +432,13 @@ Referenzen Gaußprozesse II
 
 - Kevin Murphy "Machine Learning: a Probabilistic Perspective"
   
-  Kapitel 14 und 15 
+  Kapitel 4, 14 und 15 
 
 - David MacKay "Information Theory, Inference, and Learning Algorithms"
    
   Teil V: zeigt den Zusammenhang mit Neuronalen Netzen
   
-- 
+
 Referenzen Gaußprozesse III
 ========================================================
 
@@ -278,7 +446,7 @@ Referenzen Gaußprozesse III
 
   https://betanalpha.github.io/assets/case_studies/gp_part1/part1.html
   
--  Stan User's Guide
+- Stan User's Guide
 
 - Gaußprozesse in der Geostatistik
   
@@ -291,5 +459,5 @@ Referenzen Gaußprozesse III
 - GPyTorch: https://gpytorch.readthedocs.io/en/latest/
 
 
-
+- https://docs.pymc.io/Gaussian_Processes.html
   
