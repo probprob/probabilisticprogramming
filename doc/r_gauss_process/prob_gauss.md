@@ -27,23 +27,34 @@ Anwendungsbeispiele
 
 (NCAR fields package)
 
-Interpolation
+Interpolation 
 ========================================================
 - Bayes Posterior versus Konfidenzintervall
 
+
+
+
 ```r
-library(ggplot2)
-n=10
-x<-1:n
-y<-x + rnorm(n)
-ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="loess", level=0.99, span=0.6)
+ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() +  geom_smooth(method="loess", level=0.99, span=0.6)
 ```
 
 ![plot of chunk interpolation](prob_gauss-figure/interpolation-1.png)
 
+Interpolation Splines
+========================================================
+
 - Splines 
 
   https://stats.stackexchange.com/questions/144634/splines-vs-gaussian-process-regression
+
+
+
+```r
+library(splines)
+ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="lm", formula = "y ~ splines::bs(x,3)")
+```
+
+![plot of chunk splines](prob_gauss-figure/splines-1.png)
   
 Einfache Gaußprozesse
 ========================================================
@@ -140,9 +151,9 @@ Gaußprozess Definition
 Multivariate Normalverteilung 
 ========================================================
 
--korrellierte Normalverteilungen
+- korrelierte Normalverteilungen
 
--der zweite Schritt ist mit dem ersten schwach korreliert
+- Random Walk: der zweite Schritt ist mit dem ersten schwach korreliert
 
 
 ```r
@@ -155,12 +166,12 @@ ggplot(data=steps, aes(x=X1, y=X2)) + geom_density_2d() + coord_fixed()
 (Simulation 1000 Random Walks)
 
 
-Multivariate Normalverteilung 99 Schritte
+Multivariate Normalverteilung 99 Schritte 
 ========================================================
 
--korrellierte Normalverteilungen
+- korrelierte Normalverteilungen
 
--Schritt 99 ist stark mit Schritt 98 korelliert
+-Schritt 99 ist stark mit Schritt 98 korreliert
 
 
 ```r
@@ -169,7 +180,7 @@ ggplot(data=steps, aes(x=X98, y=X99)) + geom_point() + coord_fixed()
 
 ![plot of chunk multivariat_99](prob_gauss-figure/multivariat_99-1.png)
 
-Multivariate Normalverteilung Eigenschaften
+Multivariate Normalverteilung Eigenschaften I
 ========================================================
 
 - Die marginalen Verteilungen sind immer normal
@@ -177,6 +188,9 @@ Multivariate Normalverteilung Eigenschaften
 - Konditionierung einer Dimension -> restliche Dimensionen bleiben normalverteilt 
 
   A-posteriori bleibt also Gaußprozess
+
+Multivariate Normalverteilung Eigenschaften II
+========================================================
 
 - Summen bzw. Linearkombinationen bleiben normalverteilt
 
@@ -193,16 +207,12 @@ Multivariate Normalverteilung Persp unkorreliert
 
 ```r
 m = diag(2)
-# vektorisiert, nicht normiert
 e2 <- function(x,y) exp(-rowSums((cbind(x,y) %*% solve(m) * cbind(x,y))))
-#
 x <- y<- seq(-4,4, length.out=100)
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
 ```
 
 ![plot of chunk persp1](prob_gauss-figure/persp1-1.png)
-
-- plotly interaktiv -> Projekt gaussian
 
 
 Multivariate Normalverteilung Persp korreliert
@@ -211,9 +221,7 @@ Multivariate Normalverteilung Persp korreliert
 
 ```r
 # plotly interaktiv -> Projekt gaussian
-
 m=rbind(c(1.1,0.5), c(0.5,3.1))
-
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
 ```
 
@@ -257,7 +265,7 @@ Kovarianzfunktionen
 Gaußprozess Inferenz
 ========================================================
 
-- multivariate Gaußverteilung sind sehr gutartig
+- multivariate Gaußverteilung ist sehr gutartig
 
 -  Formeln für Posterior mu und Kovarianz (keine wilden Integrale)
   
@@ -368,8 +376,8 @@ fit <- stan_lm( y ~ x, prior = R2(location = 0.5, what="mean"), chains=1)
 
 SAMPLING FOR MODEL 'lm' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 1.2e-05 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+Chain 1: Gradient evaluation took 1.1e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -386,9 +394,9 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 0.204227 seconds (Warm-up)
-Chain 1:                0.068595 seconds (Sampling)
-Chain 1:                0.272822 seconds (Total)
+Chain 1:  Elapsed Time: 0.166499 seconds (Warm-up)
+Chain 1:                0.040509 seconds (Sampling)
+Chain 1:                0.207008 seconds (Total)
 Chain 1: 
 ```
 
@@ -415,23 +423,23 @@ Model Info:
 
 Estimates:
                 mean   sd     2.5%   25%    50%    75%    97.5%
-(Intercept)     12.9    2.3    8.3   11.3   13.0   14.5   17.5 
-x                4.0    0.0    3.9    4.0    4.0    4.0    4.1 
-sigma           11.8    0.8   10.3   11.3   11.8   12.4   13.5 
+(Intercept)     13.2    3.3    7.3   11.0   12.9   15.2   19.9 
+x                4.0    0.1    3.8    3.9    4.0    4.0    4.1 
+sigma           15.3    1.1   13.4   14.6   15.2   16.0   17.6 
 log-fit_ratio    0.0    0.0    0.0    0.0    0.0    0.0    0.0 
 R2               1.0    0.0    1.0    1.0    1.0    1.0    1.0 
-mean_PPD       215.0    1.6  211.7  213.9  215.0  216.0  218.3 
-log-posterior -392.1    1.2 -395.2 -392.6 -391.8 -391.3 -390.8 
+mean_PPD       213.7    2.2  209.3  212.3  213.8  215.3  218.2 
+log-posterior -417.9    1.3 -421.3 -418.5 -417.6 -416.9 -416.4 
 
 Diagnostics:
               mcse Rhat n_eff
-(Intercept)   0.1  1.0   439 
-x             0.0  1.0   337 
-sigma         0.0  1.0   451 
-log-fit_ratio 0.0  1.0   342 
-R2            0.0  1.0   450 
-mean_PPD      0.1  1.0  1029 
-log-posterior 0.1  1.0   328 
+(Intercept)   0.2  1.0  289  
+x             0.0  1.0  302  
+sigma         0.1  1.0  372  
+log-fit_ratio 0.0  1.0  292  
+R2            0.0  1.0  371  
+mean_PPD      0.1  1.0  832  
+log-posterior 0.1  1.0  287  
 
 For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).
 ```
@@ -502,8 +510,8 @@ fit_gp <- stan(file="gp-fit.stan", data=stan_dat,
 
 SAMPLING FOR MODEL 'gp-fit' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.001261 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 12.61 seconds.
+Chain 1: Gradient evaluation took 0.001115 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 11.15 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -528,9 +536,9 @@ Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
 Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
 Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 1.01937 seconds (Warm-up)
-Chain 1:                0.898746 seconds (Sampling)
-Chain 1:                1.91811 seconds (Total)
+Chain 1:  Elapsed Time: 0.803776 seconds (Warm-up)
+Chain 1:                0.847426 seconds (Sampling)
+Chain 1:                1.6512 seconds (Total)
 Chain 1: 
 ```
 
@@ -548,11 +556,11 @@ Inference for Stan model: gp-fit.
 post-warmup draws per chain=100, total post-warmup draws=100.
 
       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-rho   1.13    0.04 0.35 0.64 0.91 1.08 1.31  1.88    61 1.00
-alpha 0.54    0.03 0.20 0.30 0.40 0.50 0.64  1.04    41 1.07
-sigma 0.34    0.00 0.02 0.30 0.33 0.34 0.36  0.38   161 1.01
+rho   1.18    0.05 0.35 0.70 0.97 1.13 1.28  2.20    50 1.00
+alpha 0.50    0.03 0.20 0.25 0.34 0.43 0.66  0.86    37 0.99
+sigma 0.34    0.00 0.03 0.29 0.32 0.34 0.36  0.40   121 0.99
 
-Samples were drawn using NUTS(diag_e) at Sat Sep 14 12:47:08 2019.
+Samples were drawn using NUTS(diag_e) at Sun Sep 15 18:00:51 2019.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).
@@ -568,6 +576,27 @@ plot(fit_gp)
 
 ![plot of chunk plot_gp](prob_gauss-figure/plot_gp-1.png)
 
+
+Probabilistic Language Stuff: Stan, pqR
+========================================================
+
+- Stanc3 Type System (Monaden für Stan?)
+
+- https://discourse.mc-stan.org/t/stanc3-type-system-overhaul/10988
+
+
+  Sean Talts. "@enetsee has brought up the idea of refactoring this such that distributions are a first class concept in a new type system ..."
+
+
+- The fundamental abstractions underlying BUGS and Stan as probabilistic programming languages
+
+  https://statmodeling.stat.columbia.edu/2017/09/07/fundamental-abstractions-underlying-bugs-stan-probabilistic-programming-languages/
+
+
+- Radford Neal: An R Language Extension for Automatic Differentiation
+
+  https://radfordneal.wordpress.com/2019/07/06/automatic-differentiation-in-pqr/
+
 Referenzen 
 ========================================================
 
@@ -581,11 +610,10 @@ Referenzen
   https://distill.pub/2019/visual-exploration-gaussian-processes/
 
   sehr coole interaktive Einführung
-  
 
 - Functional Neural Process
 
-  https://arxiv.org/abs/1906.08324
+- https://arxiv.org/abs/1906.08324http://videolectures.net/DLRLsummerschool2018_wilson_bayesian_neural_nets/
 
 Referenzen Gaußprozesse I
 ========================================================
@@ -621,7 +649,7 @@ Referenzen Gaußprozesse II
 
 - David MacKay "Information Theory, Inference, and Learning Algorithms"
    
-  Teil V: zeigt den Zusammenhang mit Neuronalen Netzen
+  Teil V: Neuronalen Netze -> Gaußprozess
   
 
 Referenzen Gaußprozesse III
@@ -644,5 +672,7 @@ Referenzen Gaußprozesse III
 - GPyTorch: https://gpytorch.readthedocs.io/en/latest/
 
 
-- https://docs.pymc.io/Gaussian_Processes.html
+- PyMC3
+
+  https://docs.pymc.io/Gaussian_Processes.html
   

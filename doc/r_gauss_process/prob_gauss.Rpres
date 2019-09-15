@@ -31,21 +31,35 @@ knitr::include_graphics("surface_spatialProcess_elevation.png")
 
 (NCAR fields package)
 
-Interpolation
+Interpolation 
 ========================================================
 - Bayes Posterior versus Konfidenzintervall
-```{r interpolation}
+```{r, echo=F }
 library(ggplot2)
 n=10
 x<-1:n
 y<-x + rnorm(n)
-ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="loess", level=0.99, span=0.6)
 
 ```
+
+
+```{r interpolation, out_with="90%"}
+ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() +  geom_smooth(method="loess", level=0.99, span=0.6)
+
+```
+
+Interpolation Splines
+========================================================
 
 - Splines 
 
   https://stats.stackexchange.com/questions/144634/splines-vs-gaussian-process-regression
+
+
+```{r splines }
+library(splines)
+ggplot(data=data.frame(x,y), aes(x=x,y=y)) + geom_point() + geom_smooth(method="lm", formula = "y ~ splines::bs(x,3)")
+```
   
 Einfache Gaußprozesse
 ========================================================
@@ -126,9 +140,9 @@ Gaußprozess Definition
 Multivariate Normalverteilung 
 ========================================================
 
--korrellierte Normalverteilungen
+- korrelierte Normalverteilungen
 
--der zweite Schritt ist mit dem ersten schwach korreliert
+- Random Walk: der zweite Schritt ist mit dem ersten schwach korreliert
 
 ```{r multivariat}
 steps <- data.frame(t(replicate(1000, cumsum(rnorm(100)))))
@@ -138,19 +152,19 @@ ggplot(data=steps, aes(x=X1, y=X2)) + geom_density_2d() + coord_fixed()
 (Simulation 1000 Random Walks)
 
 
-Multivariate Normalverteilung 99 Schritte
+Multivariate Normalverteilung 99 Schritte 
 ========================================================
 
--korrellierte Normalverteilungen
+- korrelierte Normalverteilungen
 
--Schritt 99 ist stark mit Schritt 98 korelliert
+-Schritt 99 ist stark mit Schritt 98 korreliert
 
 ```{r multivariat_99}
 ggplot(data=steps, aes(x=X98, y=X99)) + geom_point() + coord_fixed()
 
 ```
 
-Multivariate Normalverteilung Eigenschaften
+Multivariate Normalverteilung Eigenschaften I
 ========================================================
 
 - Die marginalen Verteilungen sind immer normal
@@ -158,6 +172,9 @@ Multivariate Normalverteilung Eigenschaften
 - Konditionierung einer Dimension -> restliche Dimensionen bleiben normalverteilt 
 
   A-posteriori bleibt also Gaußprozess
+
+Multivariate Normalverteilung Eigenschaften II
+========================================================
 
 - Summen bzw. Linearkombinationen bleiben normalverteilt
 
@@ -170,15 +187,10 @@ Multivariate Normalverteilung Persp unkorreliert
 
 ```{r persp1}
 m = diag(2)
-# vektorisiert, nicht normiert
 e2 <- function(x,y) exp(-rowSums((cbind(x,y) %*% solve(m) * cbind(x,y))))
-#
 x <- y<- seq(-4,4, length.out=100)
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
-
 ```
-
-- plotly interaktiv -> Projekt gaussian
 
 
 Multivariate Normalverteilung Persp korreliert
@@ -186,11 +198,8 @@ Multivariate Normalverteilung Persp korreliert
 
 ```{r persp2}
 # plotly interaktiv -> Projekt gaussian
-
 m=rbind(c(1.1,0.5), c(0.5,3.1))
-
 persp(x=x, y=y, z=outer(x, y, function(a,b) e2(a,b)))
-
 ```
 
 
@@ -231,7 +240,7 @@ Kovarianzfunktionen
 Gaußprozess Inferenz
 ========================================================
 
-- multivariate Gaußverteilung sind sehr gutartig
+- multivariate Gaußverteilung ist sehr gutartig
 
 -  Formeln für Posterior mu und Kovarianz (keine wilden Integrale)
   
@@ -278,7 +287,7 @@ Zufallsvariablen -> zufällige Funktion
 
 Zufällige Funktionen in R 
 ================================================
-```{r functional}
+```{r functional, out_width="70%"}
 library(functional)
 # linarr: n Werte einer Gerade a + b*x (im Intervall [0,1])
 linarr <- function(n,a,b) a + b * seq(0, 1, length.out = n)
@@ -383,6 +392,27 @@ plot(fit_gp)
 
 ```
 
+
+Probabilistic Language Stuff: Stan, pqR
+========================================================
+
+- Stanc3 Type System (Monaden für Stan?)
+
+- https://discourse.mc-stan.org/t/stanc3-type-system-overhaul/10988
+
+
+  Sean Talts. "@enetsee has brought up the idea of refactoring this such that distributions are a first class concept in a new type system ..."
+
+
+- The fundamental abstractions underlying BUGS and Stan as probabilistic programming languages
+
+  https://statmodeling.stat.columbia.edu/2017/09/07/fundamental-abstractions-underlying-bugs-stan-probabilistic-programming-languages/
+
+
+- Radford Neal: An R Language Extension for Automatic Differentiation
+
+  https://radfordneal.wordpress.com/2019/07/06/automatic-differentiation-in-pqr/
+
 Referenzen 
 ========================================================
 
@@ -396,11 +426,10 @@ Referenzen
   https://distill.pub/2019/visual-exploration-gaussian-processes/
 
   sehr coole interaktive Einführung
-  
 
 - Functional Neural Process
 
-  https://arxiv.org/abs/1906.08324
+- https://arxiv.org/abs/1906.08324http://videolectures.net/DLRLsummerschool2018_wilson_bayesian_neural_nets/
 
 Referenzen Gaußprozesse I
 ========================================================
@@ -436,7 +465,7 @@ Referenzen Gaußprozesse II
 
 - David MacKay "Information Theory, Inference, and Learning Algorithms"
    
-  Teil V: zeigt den Zusammenhang mit Neuronalen Netzen
+  Teil V: Neuronalen Netze -> Gaußprozess
   
 
 Referenzen Gaußprozesse III
@@ -459,5 +488,7 @@ Referenzen Gaußprozesse III
 - GPyTorch: https://gpytorch.readthedocs.io/en/latest/
 
 
-- https://docs.pymc.io/Gaussian_Processes.html
+- PyMC3
+
+  https://docs.pymc.io/Gaussian_Processes.html
   
