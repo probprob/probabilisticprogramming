@@ -1,0 +1,48 @@
+#https://github.com/tk3369/MonadFunctions.jl
+
+# nth_part(n) hat keinen sinnvollen Wert für n=0
+# maybe_nth_part(n) liefert None für n=0, Just(nth_part) für n > 0
+
+julia> nth_part(n) = x -> x/n
+nth_part (generic function with 1 method)
+
+julia> half = nth_part(2)
+#3 (generic function with 1 method)
+
+julia> half(3)
+1.5
+
+julia> crash = nth_part(0)
+#3 (generic function with 1 method)
+
+julia> crash(2)
+Inf
+
+julia> using MonadFunctions
+
+
+julia> maybe_nth_part(n) = n > 0 ? just(x -> x/n) : None()
+maybe_nth_part (generic function with 1 method)
+
+julia> maybe_half = maybe_nth_part(2)
+Just{getfield(Main, Symbol("##5#6")){Int64}}(getfield(Main, Symbol("##5#6")){Int64}(2))
+
+
+julia> fmap(f -> f(2) ,maybe_half)
+Just{Float64}(1.0)
+
+julia> maybe_crash = maybe_nth_part(0)
+None()
+
+julia> fmap(f -> f(2) ,maybe_crash)
+None()
+
+
+julia> maybe_nth_part_x(n) = x -> fmap(f -> f(x), maybe_nth_part(n))
+maybe_nth_part_x (generic function with 1 method)
+
+julia> maybe_nth_part_x(2)(2) 
+Just{Float64}(1.0)
+
+julia> maybe_nth_part_x(0)(2)
+None()
