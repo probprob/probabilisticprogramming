@@ -1,0 +1,74 @@
+---
+title: "Probabilistische Modelle"
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Münzwurf geschätzt 
+
+```{r, echo=T}
+n <-100
+#Trainingsdaten
+values <- rbinom(n, 1, 0.5)
+mean(values)
+#generatives Modell lernen
+#Bernoulli - bester Schätzer (MVUE): mean für p
+model <- function(data) rbinom(1, 1, mean(data))
+generated <- replicate(n, model(values))
+mean(generated)
+```
+
+## Was will man mehr?
+
+ - Punktschätzung vergisst Unsicherheit/Varianz
+ - Schätzverfahren kontextabhängig
+ - Wahrscheinlichkeitsverteilung für Parameter -> Bayes Statistik 
+ - [Bayesian inference versus frequentist inference](https://en.wikipedia.org/wiki/Foundations_of_statistics)
+ - Bayes Verfahren ist (theoretisch) universell, eine einfache Formel
+ - kann generisch implementiert werden
+ - [Eine konkrete Analyse für uniforme Verteilung - "useful didactic tools"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4960505/)
+ 
+## Hello World in Turing/Julia 
+   
+ - Prior muss definiert werden
+ - Berechnung/Simulation ist wesentlich aufwendiger
+ - generische MCMC Inferenz
+ 
+## Semantik für den Telephone Operator I
+ 
+ - [Commutative semantics for probabilistic programming"](http://www.cs.ox.ac.uk/people/samuel.staton/papers/esop2017.pdf)
+ - einfache probabilistische funktionale Sprache (rekursiv, higher order)
+```{r, echo=T, out.width="60%"}
+# Rekursion für Random Walk
+step <- function(s, n, pos) { if(n == 0) plot(pos) else step(s + rnorm(1), n-1, append(pos, s)) }
+step(0, 40, c(0))
+```
+
+## Semantik für den Telephone Operator II
+ - denotationale Semantik: Maßtheorie 
+ - schwierig für Higher Order Funktionen
+ - operationale Semantik: Monte Carlo Sampling
+ - Implementierung via importance sampling / likelihood scores
+
+
+## Numpyro: Variational Autoencoder I
+ - Jax Bibliothek für automatische Differentiation
+ - Populäre Architektur für Deep Generative Modelling
+ - [An Introduction toVariational Autoencoders](https://arxiv.org/abs/1906.02691)
+ - Verbindung von PGM und Neuronalen Netzen
+ - Latente Variablen - Encoder NN und Decoder NN
+ - Ziel: interpretierbare latente Variablen steuern die Bildgenerierung
+
+## Numpyro: Variational Autoencoder II
+ - Standard Maximum Likelihood Schätzung (kein Bayes hier!) ist schwierig
+ - "marginal probability of data under the model is typically intractable"
+ - deswegen Näherung mit parametrisierter Verteilung
+ - Reparametrisierungstrick -> effiziente NN Training möglich   
+
+
+
