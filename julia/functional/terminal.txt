@@ -1,0 +1,77 @@
+julia> m = 6
+6
+
+julia> p = zeros(m+1);p[1]=1;p
+7-element Array{Float64,1}:
+ 1.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+
+julia> function bstep(n) p = zeros(m+1); p[n]=0.5; p[n+1] = 0.5;p;end
+
+julia> function bind(p, bstep) r = zeros(m+1); for i in 1:m r = r .+ p[i] .* bstep(i);end;r;end;
+
+julia> p = bind(p, bstep);p
+7-element Array{Float64,1}:
+ 0.5
+ 0.5
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+
+julia> p = bind(p, bstep);p
+7-element Array{Float64,1}:
+ 0.25
+ 0.5 
+ 0.25
+ 0.0 
+ 0.0 
+ 0.0 
+ 0.0 
+
+julia> p = bind(p, bstep);p
+7-element Array{Float64,1}:
+ 0.125
+ 0.375
+ 0.375
+ 0.125
+ 0.0  
+ 0.0  
+ 0.0  
+
+julia> p = bind(p, bstep);p
+7-element Array{Float64,1}:
+ 0.0625
+ 0.25  
+ 0.375 
+ 0.25  
+ 0.0625
+ 0.0   
+ 0.0   
+
+julia> p = bind(p, bstep);p
+7-element Array{Float64,1}:
+ 0.03125
+ 0.15625
+ 0.3125 
+ 0.3125 
+ 0.15625
+ 0.03125
+ 0.0    
+
+julia> using Distributions
+julia> d=Binomial(5);pdf.(d, support(d))
+6-element Array{Float64,1}:
+ 0.03125            
+ 0.15624999999999994
+ 0.31249999999999994
+ 0.31249999999999994
+ 0.15624999999999994
+ 0.03125            
+
