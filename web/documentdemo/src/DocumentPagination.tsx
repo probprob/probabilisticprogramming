@@ -5,34 +5,29 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
+  TablePagination,
   TableRow,
   TextField,
 } from "@material-ui/core";
 
 import { useState, useMemo, useRef } from "react";
-
-//Production Build mit Cache: 5000 Positionen noch OK - Speicher 80% von 8GB
-//Production Build ohne Cache: 5000 Positionen reagiert nicht - 100% Speicher und CPU
-//Production Build ohne Cache: 500 Positionen reagiert sehr langsam -60% Speicher, CPU jeweils einige Sekunden 100%
-//Production Build ohne Cache: 100 Positionen OK
-const numberPositions = 100;
+import TablePaginationActions from "@material-ui/core/TablePagination/TablePaginationActions";
+// O(view size)
+const numberPositions = 20000;
 const document: IDocument = initDocument(numberPositions);
 
-export function DocumentRef() {
+export function DocumentPagination() {
   const [toggleRender, doToggleRender] = useState<boolean>(true);
   const [caching, setCaching] = useState<boolean>(true);
 
-  //jeder Aufruf arbeitet auf derselben Referenz
-  //analog HttpSession
   const docRef = useRef<IDocument>(document);
 
-  //hier wird nur noch der Beleg berechnet und Rendern getriggered
   function updateDocument() {
     calcHeader(docRef.current);
     doToggleRender((toggleRender) => !toggleRender);
   }
 
-  //in place Delete/Insert
   function deletePos(pos: IPosition) {
     document.positions.splice(
       document.positions.findIndex((p) => p.id === pos.id),
@@ -54,22 +49,35 @@ export function DocumentRef() {
     updateDocument();
   }
 
-  
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const rows = docRef.current.positions;
+
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+  const handleChangePage = (event: any, newPage: any) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <>
       Cache
-      <Checkbox
-        checked={caching}
-        onClick={() => setCaching((c) => !c)}
-      ></Checkbox>
+      <Checkbox checked={caching} onClick={() => setCaching((c) => !c)} />
       <Header {...docRef.current} />
       <Table>
         <TableBody>
-          {docRef.current.positions.map((pos) => (
+          {(rowsPerPage > 0
+            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : rows
+          ).map((pos) => (
             <Position
               key={pos.id}
-              //jetzt Referenz auf die Position
-              //index wird nicht mehr benoetigt=
               pos={pos}
               caching={caching}
               updateDocument={updateDocument}
@@ -78,6 +86,24 @@ export function DocumentRef() {
             />
           ))}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              colSpan={3}
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              SelectProps={{
+                inputProps: { "aria-label": "rows per page" },
+                native: true,
+              }}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter>
       </Table>
     </>
   );
