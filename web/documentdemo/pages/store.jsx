@@ -2,18 +2,16 @@ import React from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import { DocumentPagination } from "../src/DocumentPagination";
-import Link from "next/link";
-
-export default function Index() {
+import { DocumentStore } from "../src/DocumentStore";
+export default function store() {
   return (
     <Container maxWidth="sm">
       <Box my={4}>
-        <Typography variant="h6" component="h1" gutterBottom>
-          Demo 
+        <Typography variant="h4" component="h1" gutterBottom>
+          Store
         </Typography>
       </Box>
-      <DocumentPagination />
+      <DocumentStore />
     </Container>
   );
 }
