@@ -8,7 +8,8 @@ import {
 } from "@material-ui/core";
 import { useState, useMemo, memo, StrictMode, useCallback } from "react";
 
-const numberPositions = 100;
+//React Profiler hat mit 50 Position unchached Update Probleme
+const numberPositions = 25;
 const document: IDocument = initDocument(numberPositions);
 
 export function DocumentOnChange() {
@@ -25,7 +26,11 @@ export function DocumentOnChange() {
     setDoc({ ...doc });
   }
   //für memo()
-  const updateDocumentCallback = useCallback( (att: keyof IPosition, idx: number, value: any) => updateDocument(att, idx, value), []);
+  const updateDocumentCallback = useCallback(
+    (att: keyof IPosition, idx: number, value: any) =>
+      updateDocument(att, idx, value),
+    []
+  );
 
   return (
     <StrictMode>
@@ -73,14 +78,24 @@ const memoWithCompareFunctionPosition = memo(UnCachedPosition, (p, n) => {
   if (!n.caching) {
     return false;
   }
-  //postext nicht wirklich notwendig 
-  return n.id === p.id && n.vatrate === p.vatrate && n.net === p.net && n.postext === p.postext;
+  //postext nicht wirklich notwendig
+  return (
+    n.id === p.id &&
+    n.vatrate === p.vatrate &&
+    n.net === p.net &&
+    n.postext === p.postext
+  );
 });
 
 //useMemo Variante
 const Position: React.FC<IPosition> = (pos) => {
   if (pos.caching) {
-    return useMemo(() => UnCachedPosition(pos), [pos.id, pos.net, pos.vatrate, pos.postext]);
+    return useMemo(() => UnCachedPosition(pos), [
+      pos.id,
+      pos.net,
+      pos.vatrate,
+      pos.postext,
+    ]);
   }
   return UnCachedPosition(pos);
 };
@@ -102,26 +117,16 @@ function Header(doc: IDocument) {
 function PositionCell(pos: IPositionAtt) {
   return (
     <TableCell>
-      {!pos.readonly ? (
-        <TextField
-          disabled={false}
-          label={pos.att}
-          name={pos.att}
-          helperText={typeof pos[pos.att]}
-          defaultValue={pos[pos.att]}
-          onChange={(e) => {
-            pos.updateDocument(pos.att, pos.idx, e.target.value);
-          }}
-        ></TextField>
-      ) : (
-        <TextField
-          disabled={true}
-          label={pos.att}
-          name={pos.att}
-          helperText={typeof pos[pos.att]}
-          value={pos[pos.att]}
-        ></TextField>
-      )}
+      <TextField
+        disabled={false}
+        label={pos.att}
+        name={pos.att}
+        helperText={typeof pos[pos.att]}
+        value={pos[pos.att]}
+        onChange={(e) => {
+          pos.updateDocument(pos.att, pos.idx, e.target.value);
+        }}
+      ></TextField>
     </TableCell>
   );
 }
@@ -141,7 +146,7 @@ function initDocument(n: number) {
       net: net,
       vatrate: vatrate,
       servicedate: new Date(),
-      postext: ""
+      postext: "",
     };
     document.positions.push({ ...position, id: i });
   }
@@ -200,4 +205,3 @@ interface IPositionAtt extends IPosition {
   att: keyof IPosition;
   readonly?: boolean;
 }
-

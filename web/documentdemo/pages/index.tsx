@@ -9,11 +9,23 @@ export default function Index() {
   return (
     <Container maxWidth="sm">
       <Box my={4}>
-        <Typography variant="h6" component="h1" gutterBottom>
-          Demo 
-        </Typography>
+        <Link href="/onchange">State - Controlled Input</Link>
       </Box>
-      <DocumentPagination />
+      <Box my={4}>
+        <Link href="/state">State - Uncontrolled Input (onBlur)</Link>
+      </Box>
+      <Box my={4}>
+        <Link href="/memo">Memo (useCallback)</Link>
+      </Box>
+      <Box my={4}>
+        <Link href="/store">Store (useRef) - Pagination</Link>
+      </Box>
+      <Box my={4}>
+        <Link href="/jotai">Jotai - Reactive State</Link>
+      </Box>
+      <Box my={4}>
+        <Link href="/jotaiAtomReactComponent">Jotai - Reactive React Component</Link>
+      </Box>
     </Container>
   );
 }
