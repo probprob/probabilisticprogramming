@@ -8,12 +8,12 @@ import {
 } from "@material-ui/core";
 import { useState, useMemo, memo, StrictMode, useCallback } from "react";
 
-const numberPositions = 50;
+const numberPositions = 100;
 const document: IDocument = initDocument(numberPositions);
 
-export function Document() {
+export function DocumentOnChange() {
   const [doc, setDoc] = useState<IDocument>(document);
-  const [caching, setCaching] = useState<boolean>(true);
+  const [caching, setCaching] = useState<boolean>(false);
 
   function updateDocument(att: keyof IPosition, idx: number, value: any) {
     const pos: IPosition = doc.positions[idx];
@@ -109,7 +109,7 @@ function PositionCell(pos: IPositionAtt) {
           name={pos.att}
           helperText={typeof pos[pos.att]}
           defaultValue={pos[pos.att]}
-          onBlur={(e) => {
+          onChange={(e) => {
             pos.updateDocument(pos.att, pos.idx, e.target.value);
           }}
         ></TextField>

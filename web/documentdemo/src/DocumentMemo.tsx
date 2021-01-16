@@ -6,14 +6,13 @@ import {
   TableRow,
   TextField,
 } from "@material-ui/core";
-import { useState, useMemo, memo, StrictMode, useCallback } from "react";
+import { useState, memo, StrictMode, useCallback } from "react";
 
 const numberPositions = 50;
 const document: IDocument = initDocument(numberPositions);
 
-export function Document() {
+export function DocumentMemo() {
   const [doc, setDoc] = useState<IDocument>(document);
-  const [caching, setCaching] = useState<boolean>(true);
 
   function updateDocument(att: keyof IPosition, idx: number, value: any) {
     const pos: IPosition = doc.positions[idx];
@@ -29,11 +28,6 @@ export function Document() {
 
   return (
     <StrictMode>
-      Toggle Cache
-      <Checkbox
-        checked={caching}
-        onClick={() => setCaching((c) => !c)}
-      ></Checkbox>
       <Header {...doc} />
       <Table>
         <TableBody>
@@ -42,7 +36,6 @@ export function Document() {
               key={pos.id}
               idx={idx}
               {...pos}
-              caching={caching}
               updateDocument={updateDocumentCallback}
             />
           ))}
@@ -66,24 +59,8 @@ const UnCachedPosition: React.FC<IPosition> = (pos) => {
 };
 
 //HOC Variante  - hier ist Cache immer aktiv (keine Vergleichsfunktion)
-const HOCPosition = memo(UnCachedPosition);
+const Position = memo(UnCachedPosition);
 
-//HOC Variante mit Compare Funktion
-const memoWithCompareFunctionPosition = memo(UnCachedPosition, (p, n) => {
-  if (!n.caching) {
-    return false;
-  }
-  //postext nicht wirklich notwendig 
-  return n.id === p.id && n.vatrate === p.vatrate && n.net === p.net && n.postext === p.postext;
-});
-
-//useMemo Variante
-const Position: React.FC<IPosition> = (pos) => {
-  if (pos.caching) {
-    return useMemo(() => UnCachedPosition(pos), [pos.id, pos.net, pos.vatrate, pos.postext]);
-  }
-  return UnCachedPosition(pos);
-};
 
 function Header(doc: IDocument) {
   return (
@@ -192,7 +169,6 @@ interface IPosition extends NetGross {
   postext?: string;
   servicedate: Date;
   updateDocument?: any;
-  caching?: boolean;
   idx?: number;
 }
 
