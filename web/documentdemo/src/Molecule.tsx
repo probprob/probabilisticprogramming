@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
 import { Provider, atom, Atom, useAtom } from 'jotai';
 import { atomFamily, useAtomValue } from 'jotai/utils'
 import { Getter, WritableAtom } from "jotai/core/types";
+var randomColor = require('randomcolor');
 
 const numberPositions = 50;
 
@@ -79,7 +81,6 @@ function initPositions(n: number): WritableAtom<number[], number[]> {
 const atomHeader = atom<IDocumentHeader>(defineComputeHeader());
 //hier wird reaktive Berechnung des Headers spezifiziert/berechnet
 function defineComputeHeader() {
-  console.log("defineComputeHeader");
   return (get: Getter) => {
     const ids = get(positionIdsAtom);
     const positions = ids.map(id => get(atomfamilyPositions(get(atomfamilyNetPositions({ id, net: 0, vatrate: 0 })))))
@@ -91,7 +92,7 @@ function defineComputeHeader() {
 function Header({ atomHeader }: { atomHeader: Atom<IDocumentHeader> }) {
   const doc = useAtomValue(atomHeader);
   return (
-    <div>
+    <Box style={{color: randomColor()}}>
       Net: {doc.net}
       <br />
       Vat: {doc.vat}
@@ -99,7 +100,7 @@ function Header({ atomHeader }: { atomHeader: Atom<IDocumentHeader> }) {
       Gross: {doc.gross}
       <br />
       Positions: {doc.numberPositions}
-    </div>
+    </Box>
   );
 }
 
@@ -179,7 +180,9 @@ function Position({ positionId, insertPos, deletePos }: { positionId: number, in
           Delete
         </Button>
       </TableCell>
+      <TableCell style={{color: randomColor()}} >Random Color</TableCell>
     </TableRow>
+
   );
 };
 

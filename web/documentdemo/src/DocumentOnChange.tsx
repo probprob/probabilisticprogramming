@@ -7,9 +7,10 @@ import {
   TextField,
 } from "@material-ui/core";
 import { useState, useMemo, memo, StrictMode, useCallback } from "react";
+var randomColor = require('randomcolor');
 
 //React Profiler hat mit 50 Position unchached Update Probleme
-const numberPositions = 25;
+const numberPositions = 200;
 const document: IDocument = initDocument(numberPositions);
 
 export function DocumentOnChange() {
@@ -66,6 +67,7 @@ const UnCachedPosition: React.FC<IPosition> = (pos) => {
       <PositionCell {...pos} att="vat" readonly={true} />
       <PositionCell {...pos} att="gross" readonly={true} />
       <PositionCell {...pos} att="postext" />
+      <TableCell style={{color: randomColor()}} >Random Color</TableCell>
     </TableRow>
   );
 };
@@ -102,7 +104,7 @@ const Position: React.FC<IPosition> = (pos) => {
 
 function Header(doc: IDocument) {
   return (
-    <div>
+    <div style={{color: randomColor()}}>
       Net: {doc.net}
       <br />
       Vat: {doc.vat}
@@ -118,7 +120,7 @@ function PositionCell(pos: IPositionAtt) {
   return (
     <TableCell>
       <TextField
-        disabled={false}
+        disabled={pos.readonly}
         label={pos.att}
         name={pos.att}
         helperText={typeof pos[pos.att]}

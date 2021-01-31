@@ -7,8 +7,9 @@ import {
   TextField,
 } from "@material-ui/core";
 import { useState, useMemo, memo, StrictMode, useCallback } from "react";
+var randomColor = require('randomcolor');
 
-const numberPositions = 50;
+const numberPositions = 200;
 const document: IDocument = initDocument(numberPositions);
 
 export function Document() {
@@ -61,6 +62,7 @@ const UnCachedPosition: React.FC<IPosition> = (pos) => {
       <PositionCell {...pos} att="vat" readonly={true} />
       <PositionCell {...pos} att="gross" readonly={true} />
       <PositionCell {...pos} att="postext" />
+      <TableCell style={{color: randomColor()}} >Random Color</TableCell>
     </TableRow>
   );
 };

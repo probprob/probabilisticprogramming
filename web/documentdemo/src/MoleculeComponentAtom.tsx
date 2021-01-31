@@ -6,10 +6,13 @@ import {
   TableRow,
   TextField,
 } from "@material-ui/core";
+var randomColor = require('randomcolor');
+
 
 import { Provider, atom, Atom, useAtom } from "jotai";
-import { atomFamily, useAtomValue } from "jotai/utils";
+import { atomFamily, useAtomCallback, useAtomValue } from "jotai/utils";
 import { Getter, WritableAtom } from "jotai/core/types";
+import { useCallback, useRef } from "react";
 
 const numberPositions = 50;
 
@@ -114,7 +117,7 @@ function defineComputeHeader() {
 function Header({ atomHeader }: { atomHeader: Atom<IDocumentHeader> }) {
   const doc = useAtomValue(atomHeader);
   return (
-    <div>
+    <div style={{color: randomColor()}} >
       Net: {doc.net}
       <br />
       Vat: {doc.vat}
@@ -145,12 +148,22 @@ function Positions({
 }) {
   const [ids, setIds] = useAtom(positionIdsAtom);
 
-  const insertPos = (atId: number) => {
+  //direkter Zugriff der  Eventhandler auf ids führt zu inkonsistenten Zuständen
+  //(stale closure, die frischen Eventhandler werde nicht in die gecachten Komponenten gesetzt)
+  //daher Atom Callback um immer den aktuellen Wert von ids zu ermitteln
+  const readIds = useAtomCallback(
+    useCallback((get) => {
+      return get(positionIdsAtom);
+    }, [])
+  )
+
+  const insertPos = async function (atId: number)  {
+    const ids = await readIds();
     let nextId =
       ids.reduce((prev, current) => {
         return Math.max(prev, current);
       }, 0) + 1;
-    const netPosition = { id: nextId, net: 0, vatrate: 20 };
+    const netPosition = { id: nextId, net: nextId, vatrate: 20 };
     atomfamilyNetPositions(netPosition);
     atomfamilyPositions(netPosition);
 
@@ -163,9 +176,9 @@ function Positions({
     setIds([...ids]);
   };
 
-  //TODO: remove/insert ist  buggy (mehrere Male insert/delete > Positionsliste ist out of sync)
 
-  const deletePos = (atId: number) => {
+  const deletePos = async function (atId: number) {
+    const ids = await readIds();
     atomfamilyNetPositions.remove({ id: atId, net: 0, vatrate: 0 });
     atomfamilyPositions.remove({ id: atId, net: 0, vatrate: 0 });
     atomfamilyComponents.remove({id: atId})
@@ -277,6 +290,7 @@ function PositionComponent(pos: IPositionComponentInput & IPosition) {
           Delete
         </Button>
       </TableCell>
+      <TableCell style={{color: randomColor()}} >Random Color</TableCell>
     </TableRow>
   );
 }
