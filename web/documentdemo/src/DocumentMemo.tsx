@@ -7,6 +7,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import { useState, memo, StrictMode, useCallback } from "react";
+var randomColor = require('randomcolor');
 
 const numberPositions = 50;
 const document: IDocument = initDocument(numberPositions);
@@ -24,6 +25,7 @@ export function DocumentMemo() {
     setDoc({ ...doc });
   }
   //für memo()
+   //es wird immer derselbe Callback verwendet (zustandslos, leeres Dependency Array)
   const updateDocumentCallback = useCallback( (att: keyof IPosition, idx: number, value: any) => updateDocument(att, idx, value), []);
 
   return (
@@ -54,6 +56,7 @@ const UnCachedPosition: React.FC<IPosition> = (pos) => {
       <PositionCell {...pos} att="vat" readonly={true} />
       <PositionCell {...pos} att="gross" readonly={true} />
       <PositionCell {...pos} att="postext" />
+      <TableCell style={{color: randomColor()}} >Random Color</TableCell>
     </TableRow>
   );
 };

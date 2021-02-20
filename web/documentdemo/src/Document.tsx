@@ -26,6 +26,7 @@ export function Document() {
     setDoc({ ...doc });
   }
   //für memo()
+  //es wird immer derselbe Callback verwendet (zustandslos, leeres Dependency Array)
   const updateDocumentCallback = useCallback( (att: keyof IPosition, idx: number, value: any) => updateDocument(att, idx, value), []);
 
   return (
