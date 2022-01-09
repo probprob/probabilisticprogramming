@@ -42,6 +42,10 @@ siehe Korotkov (Quantum Bayes Measurement)
 
 [Wikipedia Timeline](https://en.wikipedia.org/wiki/Timeline_of_quantum_computing_and_communication)
 
+[Quantum computing in a nutshell (Quiskit)](https://qiskit.org/documentation/qc_intro.html)
+
+[Quantum Computing Concepts (Azure Quantum)](https://docs.microsoft.com/en-us/azure/quantum/concepts-overview)
+
 
 ### John Preskill: Quantum computing 40 years later ###
 
@@ -59,6 +63,20 @@ Da war QC neu und aufregend.
 
 [QUANTUM COMPUTATION](https://arxiv.org/pdf/quant-ph/9812037.pdf)
 
+
+
+### Reale Quantencomputer ###
+
+
+[What Limits the Simulation of Quantum Computers?](https://journals.aps.org/prx/pdf/10.1103/PhysRevX.10.041038)
+
+ "In this work, we provide new insight on the computing capabilities of real quantum computers by demonstrating that they can be simulated at a tiny fraction of the cost that would be needed for a perfect quantum computer."
+
+
+[Bugs in Quantum Computing Platforms: An Empirical Study](https://arxiv.org/abs/2110.14560)
+
+
+
 ### Artur Ekert: Lectures ###
 
 Eine prägnante Darstellung des klassischen Materials.
@@ -74,16 +92,14 @@ Auf den Punkt gebracht:
 [Greg Kuperberg: An introduction to quantum probability, quantum mechanics, and quantumvcomputation](https://www.math.ucdavis.edu/~greg/intro.pdf)
 
 
-"To summarize, quantum probability is the most
-natural non-commutative generalization of classical
-probability."
+"To summarize, quantum probability is the most natural non-commutative generalization of classical probability."
 
 
 ### Probabilistische Hardware ###
 
 Historische Referenzen:
 
-[Mansinghka, Jonas, Tenenbaum: Stochastic Digital Circuits for Probabilistic Inference (2008](https://dspace.mit.edu/bitstream/handle/1721.1/43712/MIT-CSAIL-TR-2008-069.pdf)
+[Mansinghka, Jonas, Tenenbaum: Stochastic Digital Circuits for Probabilistic Inference (2008)](https://dspace.mit.edu/bitstream/handle/1721.1/43712/MIT-CSAIL-TR-2008-069.pdf)
 
 
 Hübsch gemacht:
