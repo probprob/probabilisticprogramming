@@ -1,6 +1,6 @@
 ## Timeline Quantum Computing ##
 
-1980 Yuri Manin: "Computable and uncomputable"
+1980 Benioff, Manin, Feynman (Quantum Simulation)
 
 1984 Bennet, Brassard: BB84 (Quantum cryptography Protocol)
 
@@ -18,4 +18,11 @@
 
 2018 Ewin Tang: A quantum-inspired classical algorithm for recommendation systems 
 
-2019+ Sycamore, SyJiuzhang: Quantum Advantage?
+2019+ Sycamore, Jiuzhang: Quantum Advantage?
+
+[2022:Quantum computational advantage via high-dimensional Gaussian boson sampling](https://www.science.org/doi/full/10.1126/sciadv.abi7894)
+
+"QCA will not be marked by a single isolated experiment but rather will be established by gradually improving and scaling up “high complexity” experiments run over the course of many years, which improving classical algorithms will try to simulate."
+
+
+

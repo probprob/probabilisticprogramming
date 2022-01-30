@@ -15,6 +15,13 @@ Mixed: Open System
 
 Pure States sind die Extrempunkte (qubit: Bloch Surface) - Mixed States Linearkombinationen davon (qubit: Bloch Sphere)
 
+https://scottaaronson.blog/?p=332: 
+
+"In the standard textbook treatment of quantum mechanics, a pure quantum state is called a wave function and is treated as “real”. Mixed states are introduced much later and they are instead called “a formalism”. The standard explanation is that you can summarize an ensemble of wave functions, i.e. a classical distribution on pure states, by the “formalism” of density matrices."
+
+(Kuperberg)
+
+
 ## Analogien ##
 
 ### Joint Distribution ~ Hilbert Product Space ###

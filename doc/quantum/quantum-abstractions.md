@@ -32,6 +32,15 @@ Beispiele und Paper dazu:
 
 [This is our attempt to model the abstract Dirac's formalism of Quantum Mechanics in Haskell](https://github.com/alexandroid000/haskell_qm/blob/master/QuantumVector.lhs)
 
+
+[Haskell QIO](http://www.cs.nott.ac.uk/~psztxa/publ/qio.pdf)
+
+
+Kann man als Nachfolger von QIO sehen:
+
+[Haskell Quipper](https://hackage.haskell.org/package/quipper-0.7/docs/Quipper.html)
+
+
 --------
 
 ## Lean Mathlib ##
